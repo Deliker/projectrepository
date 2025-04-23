@@ -26,7 +26,7 @@ import com.example.demo.service.UserService;
 
 @RestController
 @RequestMapping("/api/tasks")
-@CrossOrigin(origins = "http://localhost:8080", allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:8081"}, allowCredentials = "true")
 public class TaskController {
 
     private final TaskService taskService;

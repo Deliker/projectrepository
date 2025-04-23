@@ -838,54 +838,71 @@ export default {
       this.timerNotificationMessage = '';
     },
 
-    addTask() {
+    async addTask() {
       if (this.selectedYear !== null && this.selectedMonth !== null && this.selectedDay !== null && this.newTask.trim()) {
-        const key = `${this.selectedYear}-${this.selectedMonth}-${this.selectedDay}`;
-        if (!this.tasks[key]) {
-          this.tasks[key] = [];
-        }
-
-        const durationMinutes = (
-            (parseInt(this.taskDurationWeeks) || 0) * 7 * 24 * 60 +
-            (parseInt(this.taskDurationDays) || 0) * 24 * 60 +
-            (parseInt(this.taskDurationHours) || 0) * 60 +
-            (parseInt(this.taskDurationMinutes) || 0)
-        );
-
-        const category = this.taskCategories.find(c => c.id === this.selectedCategory);
-        const newTask = {
-          id: this.generateTaskId(),
-          description: this.newTask.trim(),
-          priority: this.taskPriority,
-          category: this.selectedCategory,
-          categoryColor: category.color,
-          completed: false,
-          year: this.selectedYear,
-          month: this.selectedMonth,
-          day: this.selectedDay,
-          createdAt: new Date().toISOString(),
-          duration: durationMinutes,
-          timerActive: false,
-          timeRemaining: durationMinutes > 0 ? durationMinutes * 60 : null
-        };
-
-        this.tasks[key].push(newTask);
-
-        const taskCreatedEvent = new CustomEvent('task-created', {
-          detail: newTask
-        });
-        document.dispatchEvent(taskCreatedEvent);
-
-        setTimeout(() => {
-          this.tasks[key].sort((a, b) => {
-            const priorityOrder = {high: 1, medium: 2, low: 3};
-            return priorityOrder[a.priority] - priorityOrder[b.priority];
+        try {
+          const userId = localStorage.getItem('user_id');
+          if (!userId) {
+            console.error('No user ID found in localStorage');
+            alert('Please log in to create tasks');
+            return;
+          }
+          
+          // Prepare task data for the API
+          const taskData = {
+            description: this.newTask.trim(),
+            priority: this.taskPriority,
+            category: this.selectedCategory,
+            year: this.selectedYear,
+            month: this.selectedMonth,
+            day: this.selectedDay,
+            duration: (
+              (parseInt(this.taskDurationWeeks) || 0) * 7 * 24 * 60 +
+              (parseInt(this.taskDurationDays) || 0) * 24 * 60 +
+              (parseInt(this.taskDurationHours) || 0) * 60 +
+              (parseInt(this.taskDurationMinutes) || 0)
+            )
+          };
+          
+          console.log('Sending task data:', taskData);
+          // Send task to backend
+          const response = await this.$api.createTask(taskData, userId);
+          console.log('Server response:', response);
+          const createdTask = response.data;
+          
+          // Add to local state
+          const key = `${this.selectedYear}-${this.selectedMonth}-${this.selectedDay}`;
+          if (!this.tasks[key]) {
+            this.tasks[key] = [];
+          }
+          
+          // Add category color
+          const category = this.taskCategories.find(c => c.id === this.selectedCategory);
+          createdTask.categoryColor = category.color;
+          
+          this.tasks[key].push(createdTask);
+          
+          // Emit the task-created event
+          const taskCreatedEvent = new CustomEvent('task-created', {
+            detail: createdTask
           });
-          this.saveTasks();
-        }, 300);
-
-        this.closeTaskModal();
-        this.playAddAnimation();
+          document.dispatchEvent(taskCreatedEvent);
+          
+          // Sort tasks by priority
+          setTimeout(() => {
+            this.tasks[key].sort((a, b) => {
+              const priorityOrder = {high: 1, medium: 2, low: 3};
+              return priorityOrder[a.priority] - priorityOrder[b.priority];
+            });
+            this.saveTasks();
+          }, 300);
+          
+          this.closeTaskModal();
+          this.playAddAnimation();
+        } catch (error) {
+          console.error('Failed to create task:', error);
+          alert('Failed to create task. Please try again.');
+        }
       } else {
         const inputElement = document.getElementById('task-input');
         if (inputElement) {
@@ -1354,25 +1371,40 @@ export default {
     }
   },
 
-  mounted() {
+  async mounted() {
+  try {
+    const userId = localStorage.getItem('user_id');
+    if (userId) {
+      const response = await this.$api.getAllTasks(userId);
+      const tasksFromBackend = response.data;
+
+      const processedTasks = {};
+      tasksFromBackend.forEach(task => {
+        const key = `${task.year}-${task.month}-${task.day}`;
+        if (!processedTasks[key]) {
+          processedTasks[key] = [];
+        }
+
+        const category = this.taskCategories.find(c => c.id === task.category);
+        task.categoryColor = category ? category.color : '#757575';
+        
+        processedTasks[key].push(task);
+      });
+      
+      this.tasks = processedTasks;
+    } else {
+      const savedTasks = localStorage.getItem('tasks');
+      if (savedTasks) {
+        this.tasks = JSON.parse(savedTasks);
+      }
+    }
+  } catch (error) {
+    console.error('Failed to load tasks:', error);
     const savedTasks = localStorage.getItem('tasks');
     if (savedTasks) {
       this.tasks = JSON.parse(savedTasks);
-
-      this.migrateTasksFormat();
-
-      Object.values(this.tasks).forEach(tasklist => {
-        tasklist.forEach(task => {
-          if (!task.id) {
-            task.id = this.generateTaskId();
-          }
-
-          if (task.timerActive && task.timeRemaining > 0) {
-            this.toggleTimer(task);
-          }
-        });
-      });
     }
+  }
 
     this.updateDayAttributes();
 

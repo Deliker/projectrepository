@@ -9,7 +9,8 @@ export default {
         about: 'Par mums',
         login: 'Pieslēgties',
         signup: 'Reģistrēties',
-        logout: 'Iziet'
+        logout: 'Iziet',
+        admin: 'Administratora panelis'
     },
 
     // Home Page
@@ -208,6 +209,58 @@ export default {
         cta: {
             title: 'Vēlaties to izmēģināt?',
             subtitle: 'Tad pievienojieties mums un sāciet savu produktivitātes ceļojumu jau šodien!',
+        },
+    },
+
+    //admin Page
+    admin: {
+        title: 'Administrācijas panelis',
+
+        subtitle: 'Pārvaldiet lietotājus, uzdevumus un sasniegumus',
+        search: 'Meklēt...',
+        actions: 'Darbības',
+        tabs: {
+            users: 'Lietotāji',
+            tasks: 'Uzdevumi',
+            achievements: 'Sasniegumi',
+        },
+        stats: {
+            totalUsers: 'Kopējais lietotāju skaits',
+            totalTasks: 'Kopējais uzdevumu skaits',
+            totalAchievements: 'Kopējais sasniegumu skaits',
+        },
+        users: {
+            title: 'Lietotāju pārvaldība',
+            addUser: 'Pievienot lietotāju',
+            name: 'Vārds',
+            email: 'E-pasts',
+            role: 'Loma',
+            edit: 'Rediģēt',
+            delete: 'Dzēst',
+            noUsers: 'Nav lietotāju atrasts',
+        },
+        tasks: {
+            title: 'Uzdevumu pārvaldība',
+            description: 'Apraksts',
+            category: 'Kategorija',
+            priority: 'Prioritāte',
+            date: 'Datums',
+            status: 'Statuss',
+            user: 'Lietotājs',
+            edit: 'Rediģēt',
+            delete: 'Dzēst',
+            noTasks: 'Nav uzdevumu atrasts',
+        },
+        achievements: {
+            title: 'Sasniegumu pārvaldība',
+            description: 'Apraksts',
+            category: 'Kategorija',
+            points: 'Punkti',
+            user: 'Lietotājs',
+            unlockDate: 'Atbloķēšanas datums',
+            edit: 'Rediģēt',
+            delete: 'Dzēst',
+            noAchievements: 'Nav sasniegumu atrasts',
         },
     },
 

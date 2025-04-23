@@ -9,7 +9,8 @@ export default {
         about: 'About',
         login: 'Login',
         signup: 'Sign Up',
-        logout: 'Logout'
+        logout: 'Logout',
+        admin: 'Admin Dashboard'
     },
 
     // Home Page
@@ -216,6 +217,57 @@ export default {
         cta: {
             title: 'Wanna try it out?',
             subtitle: 'Then join us and start your productivity journey today!',
+        },
+    },
+
+    //admin page
+    admin: {
+        title: 'Admin Dashboard',
+        subtitle: 'Manage users and tasks efficiently',
+        search: 'Search...',
+        actions: 'Actions',
+        tabs: {
+            users: 'Users',
+            tasks: 'Tasks',
+            achievements: 'Achievements',
+        },
+        stats: {
+            totalUsers: 'Total Users',
+            totalTasks: 'Total Tasks',
+            totalAchievements: 'Total Achievements',
+        },
+        users: {
+            title: 'User Management',
+            addUser: 'Add User',
+            name: 'Name',
+            email: 'Email',
+            role: 'Role',
+            edit: 'Edit',
+            delete: 'Delete',
+            noUsers: 'No users found',
+        },
+        tasks: {
+            title: 'Task Management',
+            description: 'Description',
+            category: 'Category',
+            priority: 'Priority',
+            date: 'Date',
+            status: 'Status',
+            user: 'User',
+            edit: 'Edit',
+            delete: 'Delete',
+            noTasks: 'No tasks found',
+        },
+        achievements: {
+            title: 'Achievement Management',
+            description: 'Description',
+            category: 'Category',
+            points: 'Points',
+            user: 'User',
+            unlockDate: 'Unlock Date',
+            edit: 'Edit',
+            delete: 'Delete',
+            noAchievements: 'No achievements found',
         },
     },
 

@@ -1,22 +1,22 @@
 package com.example.demo.service;
 
-import com.example.demo.model.Achievement;
-import com.example.demo.model.User;
-import com.example.demo.repository.AchievementRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.example.demo.model.Achievement;
+import com.example.demo.model.User;
+import com.example.demo.repository.AchievementRepository;
 
 @Service
 public class AchievementService {
 
     private final AchievementRepository achievementRepository;
 
-    // Achievement definitions (in a real app, these might be stored in a database)
     private final Map<String, Map<String, Object>> achievementDefinitions = new HashMap<>();
 
     @Autowired
@@ -62,6 +62,10 @@ public class AchievementService {
         achievementDefinitions.put(id, achievement);
     }
 
+    public List<Achievement> getAllAchievements() {
+        return achievementRepository.findAll();
+    }
+
     public List<Achievement> getAllAchievementsForUser(User user) {
         return achievementRepository.findByUser(user);
     }
@@ -79,18 +83,15 @@ public class AchievementService {
     }
 
     public Achievement unlockAchievement(User user, String achievementId) {
-        // Check if user already has this achievement
         if (hasAchievement(user, achievementId)) {
             return null;
         }
-        
-        // Get achievement definition
+
         Map<String, Object> definition = achievementDefinitions.get(achievementId);
         if (definition == null) {
             throw new IllegalArgumentException("Achievement not found: " + achievementId);
         }
-        
-        // Create and save new achievement
+
         Achievement achievement = new Achievement(
             achievementId,
             (String) definition.get("title"),
@@ -129,6 +130,10 @@ public class AchievementService {
 
     public Integer getTotalPoints(User user) {
         return achievementRepository.getTotalPoints(user);
+    }
+
+    public void deleteAchievement(Long id) {
+        achievementRepository.deleteById(id);
     }
 
     public Map<String, Object> getAchievementStats(User user) {
