@@ -13,8 +13,6 @@ import HomePage from './components/HomePage.vue';
 import CalendarPage from './components/CalendarPage.vue';
 import AchievementsPage from './components/AchievementsPage.vue';
 import AuthPage from './components/AuthPage.vue';
-import AboutPage from './components/AboutPage.vue';
-import AdminPage from './components/AdminPage.vue';
 
 // Initialize auth service
 auth.init();
@@ -73,17 +71,6 @@ const routes = [
         path: '/auth',
         component: AuthPage,
         meta: { title: 'Log In - TaskMaster' }
-    },
-    {
-        path: '/about',
-        component: AboutPage,
-        meta: { title: 'About - TaskMaster' }
-    },
-    {
-        path: '/admin',
-        component: AdminPage,
-        beforeEnter: requireAdmin,
-        meta: { title: 'Admin Dashboard - TaskMaster' }
     },
     // Catch-all 404 route
     {
