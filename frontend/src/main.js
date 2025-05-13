@@ -2,6 +2,8 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import { createRouter, createWebHistory } from 'vue-router';
 import i18n from './i18n';
+import apiService from './services/api';
+
 
 // Import services
 import auth from './services/auth';
@@ -25,6 +27,22 @@ const requireAuth = (to, from, next) => {
                 mode: 'login'
             }
         });
+    } else {
+        next();
+    }
+};
+
+const requireAdmin = (to, from, next) => {
+    if (!auth.isAuthenticated()) {
+        next({
+            path: '/auth',
+            query: {
+                redirect: to.fullPath,
+                mode: 'login'
+            }
+        });
+    } else if (!auth.isAdmin()) {
+        next({ path: '/' });
     } else {
         next();
     }
@@ -87,6 +105,8 @@ router.afterEach((to) => {
     } else if (to.path === '/auth') {
         const mode = to.query.mode === 'register' ? i18n.global.t('nav.signup') : i18n.global.t('nav.login');
         document.title = `${mode} - ${appName}`;
+    } else if (to.path === '/admin') {
+        document.title = `Admin - ${appName}`;
     } else {
         document.title = to.meta.title || appName;
     }
@@ -97,6 +117,9 @@ const app = createApp(App);
 
 // Global properties
 app.config.globalProperties.$auth = auth.state;
+
+// Global methods
+app.config.globalProperties.$api = apiService;
 
 // Use i18n
 app.use(i18n);

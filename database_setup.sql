@@ -4,12 +4,13 @@ CREATE DATABASE IF NOT EXISTS taskmaster CHARACTER SET utf8mb4 COLLATE utf8mb4_u
 -- Use the database
 USE taskmaster;
 
--- Create users table
+-- Create users table with role field as ENUM
 CREATE TABLE IF NOT EXISTS users (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
+    role ENUM('USER', 'ADMIN') NOT NULL DEFAULT 'USER',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -45,11 +46,15 @@ CREATE TABLE IF NOT EXISTS achievements (
     UNIQUE KEY user_achievement (user_id, achievement_id)
 );
 
--- Insert a test user (password is 'password' encrypted with BCrypt)
-INSERT INTO users (name, email, password) VALUES 
-('Test User', 'test@example.com', '$2a$10$aCvAGxXhYSMmXs7yN2gP0.Tln5UBUbj56AYxgzrKa/AuWnf5zTXeS');
+-- Insert a regular user (password is 'password' encrypted with BCrypt)
+INSERT INTO users (name, email, password, role) VALUES 
+('Test User', 'test@example.com', '$2a$10$aCvAGxXhYSMmXs7yN2gP0.Tln5UBUbj56AYxgzrKa/AuWnf5zTXeS', 'USER');
 
--- Insert some test tasks for this user
+-- Insert an admin user (password is 'admin' encrypted with BCrypt)
+INSERT INTO users (name, email, password, role) VALUES 
+('Admin User', 'admin@example.com', '$2a$10$aCvAGxXhYSMmXs7yN2gP0.Tln5UBUbj56AYxgzrKa/AuWnf5zTXeS', 'ADMIN');
+
+-- Insert some test tasks for the regular user
 INSERT INTO tasks (description, category, priority, year, month, day, duration, user_id) VALUES
 ('Complete project proposal', 'work', 'high', 2025, 3, 20, 120, 1),
 ('Go for a run', 'health', 'medium', 2025, 3, 20, 45, 1),
@@ -57,7 +62,7 @@ INSERT INTO tasks (description, category, priority, year, month, day, duration, 
 ('Prepare presentation', 'work', 'high', 2025, 3, 22, 90, 1),
 ('Call parents', 'personal', 'medium', 2025, 3, 23, 30, 1);
 
--- Insert some achievements for this user
+-- Insert some achievements for the test user
 INSERT INTO achievements (achievement_id, title, description, icon, points, category, user_id) VALUES
 ('beginner', 'First Step', 'Complete your first task', '🎯', 10, 'daily', 1),
 ('multitasker', 'Multitasker', 'Complete tasks in 5 different categories', '🎭', 50, 'special', 1);

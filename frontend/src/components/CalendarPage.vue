@@ -1021,6 +1021,7 @@ export default {
         }, 1000);
       }
     },
+    
     async addTask() {
       // Basic validation
       if (!this.newTask.trim()) {
@@ -1771,16 +1772,39 @@ export default {
   },
 
   async mounted() {
-    try {
-      // First load from localStorage
-      this.loadTasksFromLocalStorage();
+  try {
+    const userId = localStorage.getItem('user_id');
+    if (userId) {
+      const response = await this.$api.getAllTasks(userId);
+      const tasksFromBackend = response.data;
 
-      // Then load from server
-      await this.loadTasksForMonth();
-      this.updateDayAttributes();
-    } catch (error) {
-      console.error('Error initializing calendar page:', error);
+      const processedTasks = {};
+      tasksFromBackend.forEach(task => {
+        const key = `${task.year}-${task.month}-${task.day}`;
+        if (!processedTasks[key]) {
+          processedTasks[key] = [];
+        }
+
+        const category = this.taskCategories.find(c => c.id === task.category);
+        task.categoryColor = category ? category.color : '#757575';
+        
+        processedTasks[key].push(task);
+      });
+      
+      this.tasks = processedTasks;
+    } else {
+      const savedTasks = localStorage.getItem('tasks');
+      if (savedTasks) {
+        this.tasks = JSON.parse(savedTasks);
+      }
     }
+  } catch (error) {
+    console.error('Failed to load tasks:', error);
+    const savedTasks = localStorage.getItem('tasks');
+    if (savedTasks) {
+      this.tasks = JSON.parse(savedTasks);
+    }
+  }
 
     document.addEventListener('click', this.handleOutsideClick);
     window.addEventListener('mousemove', this.trackMousePosition);

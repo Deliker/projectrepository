@@ -40,12 +40,12 @@ public class AuthController {
             }
 
             User savedUser = userService.createUser(user);
-            
-            // Create response with user info (without password)
+
             Map<String, Object> response = new HashMap<>();
             response.put("id", savedUser.getId());
             response.put("name", savedUser.getName());
             response.put("email", savedUser.getEmail());
+            response.put("role", savedUser.getRole().name());
             response.put("message", "User registered successfully");
             
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -71,15 +71,14 @@ public class AuthController {
         
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            
-            // Create response with user info (without password)
+   
             Map<String, Object> response = new HashMap<>();
             response.put("id", user.getId());
             response.put("name", user.getName());
             response.put("email", user.getEmail());
+            response.put("role", user.getRole().name());
             response.put("message", "Login successful");
-            
-            // In a real application, you would generate a JWT token here
+ 
             response.put("token", "mock-jwt-token-" + user.getId());
             
             return ResponseEntity.ok(response);
@@ -96,14 +95,13 @@ public class AuthController {
         
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            
-            // Create response with user info (without password)
+      
             Map<String, Object> response = new HashMap<>();
             response.put("id", user.getId());
             response.put("name", user.getName());
             response.put("email", user.getEmail());
-            
-            // Add statistics
+            response.put("role", user.getRole().name());
+     
             response.put("totalTasks", userService.countUserTasks(userId));
             response.put("completedTasks", userService.countCompletedTasks(userId));
             response.put("achievements", userService.countUserAchievements(userId));

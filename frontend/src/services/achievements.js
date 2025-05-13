@@ -1,4 +1,5 @@
 // achievements.js - сервис для управления достижениями в приложении TaskMaster
+import apiService from './api';
 
 // Определение всех доступных достижений
 export const achievementsList = [
@@ -543,43 +544,48 @@ class AchievementsService {
     }
 
     // Разблокировка достижения
-    unlockAchievement(achievementId) {
-        // Проверяем, не разблокировано ли уже достижение
+    async unlockAchievement(achievementId) {
         if (this.unlockedAchievements.has(achievementId)) {
-            return false;
+        return false;
         }
 
-        // Находим достижение в списке
         const achievement = achievementsList.find(a => a.id === achievementId);
         if (!achievement) {
-            console.error(`Achievement with id "${achievementId}" not found`);
+        console.error(`Achievement with id "${achievementId}" not found`);
+        return false;
+        }
+        
+        try {
+        // Get user ID
+        const userId = localStorage.getItem('user_id');
+        if (!userId) {
+            console.error('No user ID found, cannot unlock achievement');
             return false;
         }
+  
+        await apiService.unlockAchievement(userId, achievementId);
 
-        // Разблокируем достижение
         this.unlockedAchievements.add(achievementId);
-
-        // Добавляем очки
         this.stats.totalPoints += achievement.points;
-
-        // Сохраняем состояние
         this.saveState();
 
-        // Отправляем событие о разблокировке достижения
         const event = new CustomEvent('achievement-unlocked', {
             detail: {
-                id: achievementId,
-                title: achievement.title,
-                description: achievement.description,
-                icon: achievement.icon,
-                points: achievement.points
+            id: achievementId,
+            title: achievement.title,
+            description: achievement.description,
+            icon: achievement.icon,
+            points: achievement.points
             }
         });
         document.dispatchEvent(event);
-
+        
         console.log('Achievement unlocked:', achievement.title, '(+', achievement.points, 'points)');
-
         return true;
+        } catch (error) {
+        console.error('Failed to unlock achievement:', error);
+        return false;
+        }
     }
 
     // Получение списка всех достижений с информацией о разблокировке
